@@ -2,7 +2,11 @@
 
 const Listatweets = document.querySelector('#lista-tweets')
 
+
+//******* */
 // event listeners
+//****** */
+
 eventListeners();
 
 function eventListeners(){
@@ -12,10 +16,14 @@ function eventListeners(){
     //borrar tweets
     Listatweets.addEventListener('click',borrarTweet);
 
+    //contenido cargado; Evento para cuando la pagina sea cargada al 100%
+    document.addEventListener('DOMContentLoaded', localStorageListo);
+
 }
 
-
+//******* */
 //funciones
+//******* */
 
 //Añadir el tweet del formulario
 function agregarTweet(event){
@@ -49,11 +57,30 @@ event.preventDefault()
 
 if(event.target.className === 'borrar-tweet'){
     event.target.parentElement.remove();
-    alert('Tweet eliminado');
+    borrarTweetLocalStorage(event.target.parentElement.innerText);
 }
 
 }
 
+
+//Mostar tweets de local storage en pantalla
+function localStorageListo(){
+    let tweets = obtenerTweetsLocalStorage();
+    tweets.forEach((tweet)=>{
+            //boton de eliminar
+        let botonBorrar = document.createElement('a');
+        botonBorrar.classList = 'borrar-tweet';
+        botonBorrar.innerText = 'Borrar'
+
+        //crear elemento y añadir el contenido a la lista
+        let li = document.createElement('li');
+        li.innerText = tweet;
+        //añade el boton de borrar
+        li.appendChild(botonBorrar);
+        //añade el tweet a la lista
+        Listatweets.appendChild(li)
+    })
+}
 
 //Agregar tweet al local storage
 function agregarTweetLocalStorage(tweet){
@@ -68,7 +95,7 @@ function agregarTweetLocalStorage(tweet){
 
 }
 
-//obtener tweets de local storage
+//obtener tweets de local storage como un arreglo
 function obtenerTweetsLocalStorage(){
     let tweets;
 
@@ -79,4 +106,21 @@ function obtenerTweetsLocalStorage(){
         tweets = JSON.parse(localStorage.getItem('tweets'));
     }
     return tweets;
+}
+
+//Eliminar tweet de local storage
+function borrarTweetLocalStorage(tweet){
+
+    let tweets = obtenerTweetsLocalStorage();
+    
+    //Elimina la palabra buscar del tweet
+    let tweetBorrar = tweet.substring(0, tweet.length - 6); 
+
+    tweets.forEach((tweet,index)=>{
+        if(tweetBorrar == tweet){
+            tweets.splice(index, 1);
+        }
+    });
+
+    localStorage.setItem('tweets', JSON.stringify(tweets));
 }
